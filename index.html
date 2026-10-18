@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>牧養材料</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <noscript>
-        <meta http-equiv="refresh" content="0; url=https://raw.githubusercontent.com/user-7510/shepherding_materials_dump/refs/heads/main/data/A02_09s.txt">
+        <meta http-equiv="refresh" content="0; url=https://raw.githubusercontent.com/user-7510/shepherding_materials_dump/refs/heads/main/data/A06_12s.txt">
     </noscript>
     <style>
         :root {
@@ -101,6 +104,24 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        #toolbarRight {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        #weeklyBtn {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            font-size: 0.9rem;
+        }
+
+        #weeklyBtn:disabled {
+            opacity: 0.5;
+            cursor: default;
         }
 
         #moreBtn {
@@ -281,9 +302,12 @@
                     <path d="M3 1.5 L14 8 L3 14.5 Z" fill="currentColor"></path>
                 </svg>
             </span>
-            <span id="toolbarTitle">牧養材料 本週進度 系列二 第九題 神的經綸</span>
+            <span id="toolbarTitle">牧養材料 本週進度 系列六 第十二題 擘餅聚會</span>
         </div>
-        <button id="moreBtn" aria-label="更多選項" aria-expanded="false">&#8942;</button>
+        <div id="toolbarRight">
+            <button id="weeklyBtn" class="toolbarButton" aria-label="跳到本週進度" disabled>本週進度</button>
+            <button id="moreBtn" aria-label="更多選項" aria-expanded="false">&#8942;</button>
+        </div>
     </div>
 
     <div id="toolbarExtra">
@@ -315,10 +339,31 @@
         const FONT_SCALE_MIN = 0.7;
         const FONT_SCALE_MAX = 2.0;
         const FONT_SCALE_STEP = 0.1;
-        const SELECTED_CHAPTER_KEY = 'selectedChapterTitle';
         const HEADING_PUNCTUATION = ['、', '，', '。', '；', '：', '（', '）', '『', '』'];
 
         let chaptersMap = {};
+        let weeklyTitle = '';
+        let weeklyTopic = '';
+
+        function withNoCache(url) {
+            return `${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
+        }
+
+        function updateToolbarTitle() {
+            if (!weeklyTitle) {
+                return;
+            }
+            const topicPart = weeklyTopic ? ` ${weeklyTopic}` : '';
+            document.getElementById('toolbarTitle').textContent = `牧養材料 本週進度 ${weeklyTitle}${topicPart}`;
+        }
+
+        function goToWeekly() {
+            if (!weeklyTitle) {
+                return;
+            }
+            document.getElementById('chapterSelect').value = weeklyTitle;
+            loadTextFromUrl(chaptersMap[weeklyTitle], weeklyTitle);
+        }
 
         function isHeadingBlock(blockText) {
             if (!blockText) {
@@ -352,7 +397,7 @@
         }
 
         async function loadConfig() {
-            const configResponse = await fetch(CONFIG_URL, { cache: 'no-store' });
+            const configResponse = await fetch(withNoCache(CONFIG_URL), { cache: 'no-store' });
 
             if (!configResponse.ok) {
                 throw new Error(`HTTP ${configResponse.status}：無法讀取設定檔 config.json`);
@@ -374,7 +419,7 @@
                     throw new Error('缺少可載入的文字檔連結');
                 }
 
-                const textResponse = await fetch(textFileUrl, { cache: 'no-store' });
+                const textResponse = await fetch(withNoCache(textFileUrl), { cache: 'no-store' });
 
                 if (!textResponse.ok) {
                     throw new Error(`HTTP ${textResponse.status}：無法讀取檔案，八成是我搞錯了。`);
@@ -405,7 +450,6 @@
 
             select.addEventListener('change', () => {
                 const selectedTitle = select.value;
-                localStorage.setItem(SELECTED_CHAPTER_KEY, selectedTitle);
                 loadTextFromUrl(chaptersMap[selectedTitle], selectedTitle);
             });
         }
@@ -419,11 +463,13 @@
                 const chapterTitles = Object.keys(chaptersMap);
 
                 if (chapterTitles.length > 0) {
-                    const savedTitle = localStorage.getItem(SELECTED_CHAPTER_KEY);
-                    const initialTitle = (savedTitle && chaptersMap[savedTitle]) ? savedTitle : chapterTitles[0];
+                    weeklyTitle = chapterTitles.find((title) => chaptersMap[title] === config.textFileUrl) || chapterTitles[0];
+                    weeklyTopic = config.weeklyTopic || '';
 
-                    populateChapterSelect(initialTitle);
-                    await loadTextFromUrl(chaptersMap[initialTitle], initialTitle);
+                    updateToolbarTitle();
+                    populateChapterSelect(weeklyTitle);
+                    document.getElementById('weeklyBtn').disabled = false;
+                    await loadTextFromUrl(chaptersMap[weeklyTitle], weeklyTitle);
                 } else {
                     if (!config.textFileUrl) {
                         throw new Error('config.json 內缺少 textFileUrl 或 chapters 欄位');
@@ -520,11 +566,19 @@
                 currentScale = applyFontScale(currentScale - FONT_SCALE_STEP);
             });
 
+            document.getElementById('weeklyBtn').addEventListener('click', goToWeekly);
+
             updateToolbarHeight();
             window.addEventListener('resize', updateToolbarHeight);
             initScrollHide();
             initMoreMenu();
         }
+
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
 
         initToolbar();
         loadTextFile();

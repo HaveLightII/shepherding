@@ -4,7 +4,8 @@ setWeeklyDefault.py
 
 詢問使用者「本週進度」是系列幾、第幾題（以及可選的本週主題文字），
 並將這個篇題同步設為：
-  1. config.json 的預設篇目（"textFileUrl"，並置頂於 "chapters"）
+  1. config.json 的預設篇目（"textFileUrl"，並置頂於 "chapters"；
+     其餘篇目依系列、章節編號排序，另寫入 "weeklyTopic"）
   2. index.html 的：
      - <noscript> 內的 meta refresh 網址
      - 工具列上方的 #toolbarTitle 顯示文字（"牧養材料 本週進度 系列X 第Y題 主題文字"）
@@ -16,6 +17,7 @@ setWeeklyDefault.py
 用法：
     python3 setWeeklyDefault.py
     python3 setWeeklyDefault.py --series 02 --chapter 07 --topic 生命的話
+    python3 setWeeklyDefault.py --order desc
 """
 
 import argparse
@@ -51,17 +53,29 @@ def saveConfig(configPath: Path, config: dict) -> None:
     )
 
 
-def setDefaultChapter(config: dict, chapterTitle: str) -> str:
-    """把指定篇題置頂並設為預設，回傳該篇的網址。"""
+def chapterSortKey(item: tuple[str, str]) -> tuple[int, int]:
+    """由網址中的 A{系列}_{章節}s.txt 取出數字作為排序依據；無法解析者排最後。"""
+    match = re.search(r"A(\d+)_(\d+)s\.txt$", item[1])
+    if match is None:
+        return (10**6, 0)
+    return (int(match.group(1)), int(match.group(2)))
+
+
+def setDefaultChapter(config: dict, chapterTitle: str, descending: bool) -> str:
+    """把指定篇題置頂並設為預設，其餘依序排列，回傳該篇的網址。"""
     chapters = config.get("chapters", {})
 
     if chapterTitle not in chapters:
         sys.exit(f"config.json 裡找不到「{chapterTitle}」，請先確認已下載並加入該篇。")
 
-    chapterUrl = chapters.pop(chapterTitle)
-    reorderedChapters = {chapterTitle: chapterUrl, **chapters}
+    chapterUrl = chapters[chapterTitle]
+    otherChapters = sorted(
+        ((title, url) for title, url in chapters.items() if title != chapterTitle),
+        key=chapterSortKey,
+        reverse=descending,
+    )
 
-    config["chapters"] = reorderedChapters
+    config["chapters"] = {chapterTitle: chapterUrl, **dict(otherChapters)}
     config["textFileUrl"] = chapterUrl
     return chapterUrl
 
@@ -95,6 +109,12 @@ def main() -> None:
     parser.add_argument("--series", help="系列編號，例如 02")
     parser.add_argument("--chapter", help="章節編號，例如 07")
     parser.add_argument("--topic", default=None, help="本週主題文字，例如「生命的話」（可留白）")
+    parser.add_argument(
+        "--order",
+        choices=["asc", "desc"],
+        default="asc",
+        help="其餘篇目的排序：asc 由小到大（預設），desc 由大到小",
+    )
     parser.add_argument("--config", default="config.json", help="config.json 路徑")
     parser.add_argument("--index", default="index.html", help="index.html 路徑")
     args = parser.parse_args()
@@ -116,7 +136,11 @@ def main() -> None:
     chapterTitle = f"系列{toChineseNumeral(int(seriesNum))} 第{toChineseNumeral(int(chapterNum))}題"
 
     config = loadConfig(configPath)
-    chapterUrl = setDefaultChapter(config, chapterTitle)
+    chapterUrl = setDefaultChapter(config, chapterTitle, args.order == "desc")
+    if topic:
+        config["weeklyTopic"] = topic
+    else:
+        config.pop("weeklyTopic", None)
     saveConfig(configPath, config)
 
     labelText = f"牧養材料 本週進度 {chapterTitle}" + (f" {topic}" if topic else "")
