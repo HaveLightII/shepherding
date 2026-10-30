@@ -31,7 +31,7 @@ import sys
 import time
 from pathlib import Path
 
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/user-7510/shepherding_materials_dump/refs/heads/main"
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/havelightii/shepher/refs/heads/main"
 PDF_URL_TEMPLATE = "https://www.churchintaichung.org/shepherding_materials/series{seriesNum}/{baseName}.pdf"
 
 CHINESE_DIGITS = "零一二三四五六七八九"
