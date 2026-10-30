@@ -32,7 +32,7 @@
 ### 下載單篇
 
 ```sh
-curl -O "https://raw.githubusercontent.com/user-7510/shepherding_materials_dump/refs/heads/main/autoDump.sh"
+curl -O "https://raw.githubusercontent.com/havelightii/shepher/refs/heads/main/autoDump.sh"
 chmod +x autoDump.sh
 ./autoDump.sh
 ```
