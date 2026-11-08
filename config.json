@@ -1,7 +1,7 @@
 {
-    "textFileUrl": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_10s.txt",
+    "textFileUrl": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_11s.txt",
     "chapters": {
-        "系列二 第十題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_10s.txt",
+        "系列二 第十一題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_11s.txt",
         "系列一 第一題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A01_01s.txt",
         "系列一 第二題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A01_02s.txt",
         "系列一 第三題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A01_03s.txt",
@@ -27,7 +27,7 @@
         "系列二 第七題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_07s.txt",
         "系列二 第八題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_08s.txt",
         "系列二 第九題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_09s.txt",
-        "系列二 第十一題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_11s.txt",
+        "系列二 第十題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_10s.txt",
         "系列二 第十二題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_12s.txt",
         "系列二 第十三題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_13s.txt",
         "系列二 第十四題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A02_14s.txt",
@@ -97,6 +97,5 @@
         "系列六 第十四題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A06_14s.txt",
         "系列六 第十五題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A06_15s.txt",
         "系列六 第十六題": "https://raw.githubusercontent.com/havelightii/shepherding/refs/heads/main/data/A06_16s.txt"
-    },
-    "weeklyTopic": "奉獻"
+    }
 }
